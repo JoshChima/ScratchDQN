@@ -199,9 +199,9 @@ def dqnmain(project_name, do_boltzman_exploration=False, test=False, chkpt=None,
     image_arr = []
 
     if (not test):
-        wandb.init( project=project_name, config=hypeparams, name=hypeparams['run_name'], reinit=True, monitor_gym=True)
+        wdbrun = wandb.init( project=project_name, config=hypeparams, name=hypeparams['run_name'], reinit=True, monitor_gym=False)
         # run.save("*.pth")
-        config = wandb.config
+        config = wdbrun.config
         max_reward = config.max_reward
         max_steps = config.max_steps
         memory_size = config.memory_size
@@ -330,7 +330,8 @@ def dqnmain(project_name, do_boltzman_exploration=False, test=False, chkpt=None,
                     update_tgt_model(m, tgt)
                     rew, frames = run_test_episode(m, test_env, device)
                     # frames.shape == (T, H, W, C)
-                    wandb.log({'test_reward': rew, 'test_video': wandb.Video(frames.transpose(0, 3, 1, 2), str(rew), fps=25, format='mp4')})
+                    # wandb.log({'test_reward': rew, 'test_video': wandb.Video(frames.transpose(0, 3, 1, 2), str(rew), fps=25, format='mp4')})
+                    wandb.log({'test_reward': rew})
                     epochs_since_tgt = 0
                     torch.save(
                         tgt.state_dict(), f"{wandb.run.dir}/{hypeparams['run_name']}_{step_num}.pth")
@@ -388,4 +389,4 @@ if __name__ == "__main__":
     #     img_display(np.hstack(ims))
     #     ims = []
 if __name__ == '__main__':
-    dqnmain('Breakout-Tutorial', do_boltzman_exploration=True, hypeparams=hyperset)
+    dqnmain('Breakout-Tutorial', do_boltzman_exploration=False, hypeparams=hyperset)
